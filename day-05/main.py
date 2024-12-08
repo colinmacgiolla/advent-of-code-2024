@@ -45,8 +45,18 @@ def main():
             invalid_pages.append(page)
 
     
-    print(f"Part 1: Sum of all values is: {total}")
+    print(f"Part 1: Sum of valid pages is: {total}")
     
+    total = 0
+    for page in invalid_pages:
+        for i in range(len(page)):
+            for j in range(i+1, len(page)):
+                if (page[i], page[j]) in rules:
+                    page[j],page[i] = page[i],page[j]
+
+        total += int(page[ len(page) // 2])        
+    
+    print(f"Part 2: Sum of fixed pages is: {total}")
 
     
     
