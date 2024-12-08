@@ -1,53 +1,45 @@
 #!/bin/python
 
-
-def is_safe(input):
-    # Check if the levels are either increasing or decreasing
-    if all( input[i] < input[i+1] for i in range(len(input)-1) ) or \
-       all( input[i] > input[i+1] for i in range(len(input)-1) ):
-           # now check the diffs
-           if all( abs( input[i] - input[i+1] ) >= 1 for i in range(len(input)-1) ) and \
-               all( abs( input[i] - input[i+1] ) <= 3 for i in range(len(input)-1) ):
-                   return True
+import re
 
 
-def damper(input):
+def part2(input):
+    do = r"do\(\)"
+    dont = r"don't\(\)"
+    mul = r"mul\((\d*),(\d*)\)"
     
-    if any(is_safe(input[:i] + input[i+1:]) for i in range(len(input))):
-        return True
-    return False   
-       
-
+    total = 0
+    enabled = True
+    
+    for x in re.finditer( f'{do}|{dont}|{mul}', input ):
+        if re.fullmatch(do, x.group() ):
+            enabled = True
+        elif re.fullmatch(dont, x.group() ):
+            enabled = False
+        elif enabled:
+            total += int(x.group(1)) * int(x.group(2))
+    return total
+        
 
 def main():
     '''
 
     '''
-    with open('.//day-02//input//data.txt') as f:
+    with open('.//day-03//input//data.txt') as f:
         raw_input = f.read()
         
-    data = []
-    for line in raw_input.split('\n'):
-        if not line == '':
-            data.append( [ int(num) for num in line.split() ])
-    
 
-    safe_reports = 0
-    unsafe_report_list = []
-    for report in data:
-        if is_safe(report):
-            safe_reports += 1
-        else:
-            unsafe_report_list.append(report)
-        
     
-    print(f"Part 1: Sum of all values is: {safe_reports}")
-    dampened_reports = 0
-    for entry in unsafe_report_list:
-        if damper(entry):
-            dampened_reports += 1
+    sum = 0
+    
+    
+    for a,b in re.findall( r"mul\((\d*),(\d*)\)", raw_input):
+        sum += int(a) * int(b)
 
-    print(f"Part 2: Dampened list is {safe_reports + dampened_reports}")
+    print(f"Part 1: Sum of all values is: {sum}")
+
+       
+    print(f"Part 2: Sum of enabled multiplications is: {part2(raw_input)}")
 
     
     print("End of Line")
