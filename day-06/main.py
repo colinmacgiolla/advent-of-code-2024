@@ -43,7 +43,40 @@ def move_guard(grid, current_position):
         grid[current_position] = new_direction
         return current_position
     
+
+def part_2(grid, start_position, locations):
+    # General idea is to insert an obsticle into the next position, then run forward until we find
+    # a position we've visited before - that is a win
+    blocker_sites = locations.copy()
+    blocker_sites.remove(start_position)
     
+    loops_detected = 0
+    visited = set()
+    
+    for block in blocker_sites:
+        updated_grid = grid.copy()
+        updated_grid[block] = '#'
+        
+        location = start_position
+        result = True
+        visited.clear()
+
+        
+        while result is not False:
+            result = move_guard(updated_grid, location)
+            if result is False:
+                # we've moved off grid
+                pass
+            else:
+                location, direction = result, updated_grid[result]
+                if ( location, direction) in visited:
+                    # We've been here before
+                    loops_detected += 1
+                    result = False
+                else:
+                    visited.add( (location, direction) )
+                    
+    return loops_detected
  
 
 def main():
@@ -67,20 +100,24 @@ def main():
         if object == '^':
             print(f"start position is: {position[0]} x {position[1]}")
             start = position
-            
+    grid_copy = grid.copy()
+      
     positions = set()
     positions.add(start)
     result = True
+    loc = start
     while result is not False:
-        result = move_guard( grid, start)
+        result = move_guard( grid, loc)
         if result is False:
             pass
         else:
             positions.add(result)
-            start = result
+            loc = result
             
     print(f"Part 1: Number of moves by the guard: {len(positions)}")
-        
+    
+    result = part_2(grid_copy, start, positions)
+    print(f"Part 2: Number of positions to create a loop: {result}")
     
     print("End of Line")
     
